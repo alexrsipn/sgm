@@ -20,8 +20,9 @@ const devConfig = {
     devServer: {
         port: 3000,
         contentBase: "../dist",
-        open: "chrome",
+    //    open: "chrome",
         hot: true,
+        historyApiFallback: true,
     },
     target: "web",
     plugins: [
