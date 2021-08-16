@@ -1,11 +1,42 @@
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { registerUser } from '../actions/auth';
 
-const Login = () => {
-    const { register, handleSubmit, formState: { errors } } = useForm();
+import Select from 'react-select';
+
+const banks = [
+    { label: "BBVA", value: "bbva" },
+    { label: "CITIBANAMEX", value: "citibanamex" },
+    { label: "SANTANDER", value: "santander" },
+    { label: "Banco del Bajío", value: "bajio" },
+    { label: "BANORTE/IXE", value: "banorte-ixe" },
+    { label: "INBURSA", value: "inbursa" },
+    { label: "MIFEL", value: "mifel" },
+    { label: "SCOTIABANK", value: "scotiabank" },
+    { label: "BANREGIO", value: "banregio" },
+    { label: "INVEX", value: "invex" },
+    { label: "AFIRME", value: "afirme" },
+    { label: "AMERICAN EXPRESS", value: "amex" },
+    { label: "BANCO AZTECA", value: "azteca" },
+    { label: "COMPARTAMOS", value: "compartamos" },
+    { label: "BANCO FAMSA", value: "famsa" },
+    { label: "WALMART", value: "walmart" },
+    { label: "BANCOPPEL", value: "bancoppel" },
+    { label: "CIBANCO", value: "cibanco" },
+    { label: "DONDÉ", value: "donde" },
+    { label: "OTRO", value: "otro" }
+];
+
+const Register = () => {
+    const dispatch = useDispatch();
+    const { register, handleSubmit, setValue, formState: { errors } } = useForm();
     const [showPass, setShowPass] = useState(false);
+    const onDropdownChange = (data) => {
+        setValue("bank", data.value, { required: true });
+    }
     const onSubmit = (data) => {
-        alert(JSON.stringify(data, null, 2))
+        dispatch(registerUser(data.bank, data.userName, data.userMail, data.userPass));
     };
     return (
         <div className="max-w-full h-screen bg-trueGray-300">
@@ -29,7 +60,16 @@ const Login = () => {
                         <div className="flex flex-col justify-between items-center w-full h-full py-4 sm:w-1/3 sm:h-1/3 lg:w-2/3 lg:h-2/3 rounded-2xl lg:nm-flat-white">
                             <p className="font-bold lg:text-xl">Sistema Gestor Monetario</p>
                             <div className="w-full flex justify-center">
-                                <form onSubmit={handleSubmit(onSubmit)}>
+                                <form onSubmit={handleSubmit(onSubmit)} className="w-5/6">
+                                    <div className="flex items-center space-x-1 lg:space-x-2 py-2 ">
+                                        <span className="text-cyan-600">
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 14v3m4-3v3m4-3v3M3 21h18M3 10h18M3 7l9-4 9 4M4 10h16v11H4V10z">
+                                                </path>
+                                            </svg>
+                                        </span>
+                                        <Select options={banks} onChange={onDropdownChange} isMulti={true} className="w-full"/>
+                                    </div>
                                     <div className="flex items-center space-x-1 lg:space-x-2 py-2">
                                         <span className="text-cyan-600">
                                             <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -37,7 +77,19 @@ const Login = () => {
                                                 </path>
                                             </svg>
                                         </span>
-                                        <input type="email" name="userMail" id="userMail" placeholder="Email" {...register("userMail", { required: {value: true, message: "Correo requerido"} })} className="px-3 rounded bg-trueGray-100 focus:outline-none focus:bg-white focus:ring focus:ring-blue-300" />
+                                        <input type="text" name="userName" id="userName" placeholder="Nombre" {...register("userName", {required: {value: true, message: "Nombre requerido"}, minLength: 6, maxLength: 36})} className="w-full px-3 rounded bg-trueGray-100 focus:outline-none focus:bg-white focus:ring focus:ring-blue-300"/>
+                                    </div>
+                                    {errors.userName && (
+                                        <span className="text-sm text-red-500">{errors.userName.message}</span>
+                                    )}
+                                    <div className="flex items-center space-x-1 lg:space-x-2 py-2">
+                                        <span className="text-cyan-600">
+                                            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z">
+                                                </path>
+                                            </svg>
+                                        </span>
+                                        <input type="email" name="userMail" id="userMail" placeholder="Correo" {...register("userMail", { required: { value: true, message: "Correo requerido" } })} className="w-full px-3 rounded bg-trueGray-100 focus:outline-none focus:bg-white focus:ring focus:ring-blue-300" />
                                     </div>
                                     {errors.userMail && (
                                         <p className="text-xs text-red-500 px-8">{errors.userMail.message}</p>
@@ -49,7 +101,7 @@ const Login = () => {
                                                 </path>
                                             </svg>
                                         </span>
-                                        <input type={showPass ? "text" : "password"} name="userPass" id="userPass" placeholder="Password" {...register("userPass", { required: { value: true, message: "Contraseña incorrecta" }, minLength: 6, maxLength: 18 })} className="px-3 rounded bg-trueGray-100 focus:outline-none focus:bg-white focus:ring focus:ring-blue-300" />
+                                        <input type={showPass ? "text" : "password"} name="userPass" id="userPass" placeholder="Contraseña" {...register("userPass", { required: { value: true, message: "Contraseña incorrecta" }, minLength: 6, maxLength: 18 })} className="w-full px-3 rounded bg-trueGray-100 focus:outline-none focus:bg-white focus:ring focus:ring-blue-300" />
                                         <span onClick={() => setShowPass(!showPass)} className="absolute right-0 text-gray-700">
                                             {showPass ? (
                                                 <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -69,8 +121,8 @@ const Login = () => {
                                     {errors.userPass && (
                                         <p className="text-xs text-red-500 px-8">{errors.userPass.message}</p>
                                     )}
-                                    <div className="flex items-center py-2">
-                                        <button type="submit" className="text-white w-full rounded-full bg-emerald-500 hover:bg-emerald-600">Ingresar</button>
+                                    <div className="flex justify-center items-center py-2">
+                                        <button type="submit" className="text-white w-1/2 rounded-full bg-emerald-500 hover:bg-emerald-600">Registrar</button>
                                     </div>
                                 </form>
                             </div>
@@ -80,7 +132,7 @@ const Login = () => {
                 </div>
             </div>
         </div>
-    )
+    );
 };
 
-export default Login;
+export default Register;
